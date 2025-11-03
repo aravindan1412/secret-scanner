@@ -24,6 +24,7 @@ def main() -> None:
 @click.option("--exclude", "excludes", multiple=True, help="Extra exclude glob(s), in addition to .gitignore")
 @click.option("--ignore-file", multiple=True, type=click.Path(exists=True, dir_okay=False, path_type=Path), help="Additional ignore files (gitignore syntax)")
 @click.option("--output-file", type=click.Path(dir_okay=False, path_type=Path), help="Write output to file instead of stdout")
+@click.option("--workers", type=int, default=0, show_default=True, help="Parallel worker count (0 = auto)")
 def scan(
 	target: Path,
 	json_out: bool,
@@ -34,6 +35,7 @@ def scan(
 	excludes: List[str],
 	ignore_file: List[Path],
 	output_file: Optional[Path],
+    workers: int,
 ) -> None:
 	ignore_spec = load_ignore_spec(target, list(ignore_file), list(excludes))
 	results = scan_path(
@@ -42,6 +44,7 @@ def scan(
 		max_file_size=max_file_size,
 		entropy_threshold=entropy_threshold,
 		enable_entropy=not no_entropy,
+        workers=workers,
 	)
 
 	if json_out:
